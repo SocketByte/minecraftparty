@@ -1,0 +1,4 @@
+name: MinecraftParty
+author: SocketByte
+version: 1.0
+main: pl.socketbyte.minecraftparty.MinecraftParty

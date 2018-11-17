@@ -1,0 +1,52 @@
+games:
+  # przykladowa gra, mozna dodawac ile sie chce, "test" w tym przypadku to id mapy ktore jest potrzebne przy tworzeniu tabliczki
+  test: # nazwa gry
+    lobby:
+      world: world
+      x: 0
+      y: 100
+      z: 0
+    max-players: 8 # maksymalna ilosc graczy
+    start-threshold: 4 # minimalna ilosc graczy do rozpoczecia gry
+    arenas: # konfiguracja aren
+      punch-the-bats: # nazwa areny
+        spawn-location: # polozenie spawnu na arenie dla graczy
+          world: world
+          x: 1000
+          y: 100
+          z: 1000
+        time: 120 # czas trwania areny w sekundach
+        countdown: 10 # czas odliczania do startu areny w sekundach
+        data: # dodatkowe informacje o arenie, sa rozne na kazdej (!)
+          bats: 200 # ilosc nietoperzy
+          bat-types:
+            5: '&6&l5 punktow' # typ za 10 punktow
+            3: '&23 punkty' # typ za 3 punkty
+            1: '&81 punkt' # typ za 1 punkt
+          bat-chances: # szanse na wystapienie danego nietoperza
+            5: 5
+            3: 25
+            1: 70
+      trampolinio:
+        spawn-location:
+          world: world
+          x: 1500
+          y: 100
+          z: 1500
+        time: 120
+        countdown: 10
+        data:
+          locations:
+            min:
+              x: 1400
+              y: 110
+              z: 1400
+            max:
+              x: 1600
+              y: 160
+              z: 1600
+          chances:
+            booster: 10 # 10% szans na booster itd
+            high: 20
+            medium: 30
+            low: 40

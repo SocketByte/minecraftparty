@@ -1,0 +1,4 @@
+waiting-for-players: '&cPotrzeba jeszcze {PLAYERS} graczy do rozpoczecia gry...'
+game-starts: '&9Gra wystartuje za &3&l{TIME}&9...'
+player-joined: '&3Gracz &9{PLAYER} &3dolaczyl do gry. (&9{PLAYERS}&3/&9{MAX}&3)'
+player-left: '&3Gracz &9{PLAYER} &3opuscil gre. (&9{PLAYERS}&3/&9{MAX}&3)'
