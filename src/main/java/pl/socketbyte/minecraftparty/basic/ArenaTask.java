@@ -4,13 +4,15 @@ import org.bukkit.scheduler.BukkitTask;
 import pl.socketbyte.minecraftparty.commons.TaskHelper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class ArenaTask {
 
     private final Arena arena;
-    private final List<BukkitTask> tasks = new ArrayList<>();
+    private final List<BukkitTask> tasks =  new CopyOnWriteArrayList<>();
 
     public ArenaTask(Arena arena) {
         this.arena = arena;

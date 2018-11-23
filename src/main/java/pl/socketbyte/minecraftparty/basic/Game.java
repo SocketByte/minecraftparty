@@ -7,7 +7,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import pl.socketbyte.minecraftparty.MinecraftParty;
+import pl.socketbyte.minecraftparty.basic.board.impl.GameBoard;
 import pl.socketbyte.minecraftparty.commons.MessageHelper;
+import pl.socketbyte.minecraftparty.commons.TaskHelper;
 import pl.socketbyte.minecraftparty.commons.io.I18n;
 
 import java.util.*;
@@ -27,8 +29,9 @@ public class Game extends Thread implements Listener {
 
     private final String id;
 
-    private final Lobby lobby;
-    private final GameCache cache;
+    private Lobby lobby;
+    private GameCache cache;
+    private GameBoard board;
 
     private final int maxPlayers;
     private final List<UUID> playing = new ArrayList<>();
@@ -47,6 +50,9 @@ public class Game extends Thread implements Listener {
         this.info = GameInfo.get(this.id);
         this.lobby = new Lobby(this);
         this.cache = new GameCache();
+        TaskHelper.sync(() -> {
+            this.board = new GameBoard(this);
+        });
         this.maxPlayers = maxPlayers;
         this.setName(this.id);
         init();
@@ -58,11 +64,32 @@ public class Game extends Thread implements Listener {
 
     public void dispose() {
         this.running = false;
-        for (Arena arena : arenas) {
-            arena.end();
-        }
         this.lobby.dispose();
-        controller.remove(this);
+        this.board.dispose();
+        this.currentArena = null;
+        this.playing.clear();
+        reset();
+    }
+
+    private void reset() {
+        Game.getController().remove(this);
+        Game.getController().create(this.id);
+    }
+
+    public int getArenas() {
+        return arenas.size();
+    }
+
+    public int getCurrentArenaIndex() {
+        return currentArenaIndex + 1;
+    }
+
+    public Arena getCurrentArena() {
+        return currentArena;
+    }
+
+    public GameBoard getBoard() {
+        return board;
     }
 
     public void addArena(Arena arena) {
@@ -104,13 +131,6 @@ public class Game extends Thread implements Listener {
         cache.teleportBack(player);
 
         if (!endGame) {
-            if (getPlaying().size() < 2) {
-                currentArena.end();
-                dispose();
-                end();
-                return;
-            }
-
             broadcast(I18n.get().message("player-left",
                     "{PLAYER}", player.getName(),
                     "{PLAYERS}", getPlaying().size(),
@@ -142,10 +162,12 @@ public class Game extends Thread implements Listener {
 
     @Override
     public void run() {
+        this.board.init();
         startNewArena();
 
         while (running) {
             if (!currentArena.isActive() && !currentArena.isFreezed()) {
+                this.board.update();
                 next();
             }
         }
@@ -155,25 +177,26 @@ public class Game extends Thread implements Listener {
      * Called when all arenas are finished
      */
     protected void end() {
-        for (Player player : getPlaying()) {
-            // TODO: 23.10.2018 Assign global XP points or something 
-            
-            leave(player, true);
-        }
         // TODO: 23.10.2018 Broadcast some winning info etc
         broadcast("Game ended!");
+
+        for (Player player : getPlaying()) {
+            // TODO: 23.10.2018 Assign global XP points or something
+
+            leave(player, true);
+        }
+
+        // dispose and prepare for next game
+        dispose();
     }
 
     public void next() {
         currentArenaIndex++;
         if (currentArenaIndex == maxArenaIndex) {
-            dispose();
             end();
             return;
         }
 
-        System.out.println("Starting new arena...");
-        broadcast("Starting new arena...");
         currentArena.end();
         startNewArena();
     }

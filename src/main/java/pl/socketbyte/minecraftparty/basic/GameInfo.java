@@ -75,8 +75,8 @@ public class GameInfo {
             double z = arenaSection.getDouble("spawn-location.z");
 
             info.setDefaultLocation(new Location(Bukkit.getWorld(world), x, y, z));
+            info.setDefaultTime(arenaSection.getInt("time"));
             info.setCountdown(arenaSection.getInt("countdown"));
-            info.setTime(arenaSection.getInt("time"));
 
             ConfigurationSection dataSection = arenaSection.getConfigurationSection("data");
             for (String dataKey : dataSection.getKeys(false)) {

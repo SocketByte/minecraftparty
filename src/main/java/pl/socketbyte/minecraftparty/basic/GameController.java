@@ -52,6 +52,7 @@ public class GameController {
             game.addArena(arena);
         }
         add(game);
+        System.out.println("Created game with id " + id);
         return game;
     }
 

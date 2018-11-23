@@ -11,13 +11,18 @@ public class ArenaInfo {
     private int countdown;
     private Location defaultLocation;
     private long time;
+    private long defaultTime;
 
     private String name;
 
     private Map<String, Object> data = new HashMap<>();
 
-    public void setTime(long time) {
-        this.time = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(time);
+    public void startTimer() {
+        this.time = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(this.defaultTime);
+    }
+
+    public void setDefaultTime(long defaultTime) {
+        this.defaultTime = defaultTime;
     }
 
     public long getTimeLeft() {

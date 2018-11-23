@@ -1,10 +1,12 @@
 package pl.socketbyte.minecraftparty.basic.arena;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import pl.socketbyte.minecraftparty.basic.Arena;
 import pl.socketbyte.minecraftparty.basic.Game;
+import pl.socketbyte.minecraftparty.basic.board.impl.ArenaBoardType;
 import pl.socketbyte.minecraftparty.commons.RandomHelper;
 import pl.socketbyte.minecraftparty.commons.TaskHelper;
 
@@ -24,26 +26,37 @@ public class TrampolinioArena extends Arena {
     }
 
     @Override
+    public void onCountdown() {
+        getGame().broadcast("&aArena Trampolinio will start in few seconds...");
+    }
+
+    @Override
+    public void onTick(long timeLeft) {
+        getGame().broadcast("&aArena Trampolinio ends in " + timeLeft + " seconds.");
+    }
+
+    @Override
+    public void onFreeze() {
+        for (Player player : getGame().getPlaying()) {
+            getGame().addPoints(player, 1000);
+        }
+        getGame().broadcast("&aArena Trampolinio freezed.");
+    }
+
+    @Override
     public void onInit() {
-        getGame().broadcast("Arena Trampolinio initialized!");
+        getGame().broadcast("&aArena Trampolinio initialized!");
+        this.getBoard().setType(ArenaBoardType.DISQUALIFICATION);
     }
 
     @Override
     public void onStart() {
-        getGame().broadcast("Arena Trampolinio started!");
-        getTaskManager().schedule(() -> {
-            if (getArenaInfo().getTimeLeftAsSeconds() <= 0) {
-                end();
-                return;
-            }
-
-            getGame().broadcast("Arena Trampolinio ends in " + getArenaInfo().getTimeLeftAsSeconds() + " seconds.");
-        }, 1, TimeUnit.SECONDS);
+        getGame().broadcast("&aArena Trampolinio started!");
     }
 
     @Override
     public void onEnd() {
-        getGame().broadcast("Arena Trampolinio ended!");
+        getGame().broadcast("&aArena Trampolinio ended!");
     }
 
     @EventHandler
@@ -54,6 +67,6 @@ public class TrampolinioArena extends Arena {
         if (!getGame().isArena(this))
             return;
 
-        getGame().broadcast("Block break in arena Trampolinio!");
+        getGame().broadcast("&aBlock break in arena Trampolinio!");
     }
 }
