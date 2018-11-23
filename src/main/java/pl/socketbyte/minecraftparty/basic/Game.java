@@ -43,6 +43,7 @@ public class Game extends Thread implements Listener {
     private int currentArenaIndex = 0;
     private int maxArenaIndex = 0;
 
+    private boolean occupied = false;
     private final GameInfo info;
 
     public Game(String id, int maxPlayers) {
@@ -104,6 +105,10 @@ public class Game extends Thread implements Listener {
         lobby.start();
     }
 
+    public boolean isOccupied() {
+        return occupied;
+    }
+
     public GameCache getCache() {
         return cache;
     }
@@ -112,8 +117,7 @@ public class Game extends Thread implements Listener {
         this.playing.add(player.getUniqueId());
         this.points.put(player.getUniqueId(), 0);
 
-        cache.addPositionCache(player);
-        cache.addInventoryCache(player);
+        cache.addCache(player);
 
         player.teleport(lobby.getLobbyLocation());
 
@@ -127,8 +131,7 @@ public class Game extends Thread implements Listener {
         this.playing.remove(player.getUniqueId());
         this.points.remove(player.getUniqueId());
 
-        cache.giveItemsBack(player);
-        cache.teleportBack(player);
+        cache.apply(player);
 
         if (!endGame) {
             broadcast(I18n.get().message("player-left",
@@ -141,6 +144,18 @@ public class Game extends Thread implements Listener {
     public void broadcast(String message) {
         for (Player player : getPlaying()) {
             MessageHelper.send(player, message);
+        }
+    }
+
+    public void broadcastTitle(String header, String sub, int fadeIn, int stay, int fadeOut) {
+        for (Player player : getPlaying()) {
+            MessageHelper.sendTitle(player, header, sub, fadeIn, stay, fadeOut);
+        }
+    }
+
+    public void broadcastActionBar(String message) {
+        for (Player player : getPlaying()) {
+            MessageHelper.sendActionBar(player, message);
         }
     }
 
@@ -162,6 +177,8 @@ public class Game extends Thread implements Listener {
 
     @Override
     public void run() {
+        this.occupied = true;
+
         this.board.init();
         startNewArena();
 

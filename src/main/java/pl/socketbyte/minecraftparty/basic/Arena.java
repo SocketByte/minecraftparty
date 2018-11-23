@@ -5,11 +5,14 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitTask;
 import pl.socketbyte.minecraftparty.MinecraftParty;
 import pl.socketbyte.minecraftparty.basic.board.impl.ArenaBoard;
+import pl.socketbyte.minecraftparty.commons.MessageHelper;
 import pl.socketbyte.minecraftparty.commons.TaskHelper;
+import pl.socketbyte.minecraftparty.commons.io.I18n;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +26,8 @@ public abstract class Arena implements Listener {
     private boolean active = false;
     private boolean freeze = false;
     private boolean countdown = false;
+
+    private String fancyName;
 
     private long realCountdown;
 
@@ -103,6 +108,7 @@ public abstract class Arena implements Listener {
 
     protected void start() {
         this.active = true;
+        this.fancyName = getFancyName();
 
         for (Player player : getGame().getPlaying()) {
             this.internalScores.put(player.getUniqueId(), 0);
@@ -115,14 +121,21 @@ public abstract class Arena implements Listener {
         this.board.init();
 
         onCountdown();
+
+        getGame().broadcastTitle(
+                I18n.get().message("arena-start-title", "{ARENA}", this.fancyName),
+                I18n.get().message("arena-start-prepare"), 40, getArenaInfo().getCountdown() / 2, 40);
         getTaskManager().schedule(() -> {
             if (!this.countdown)
                 return;
 
             this.board.update();
+            getGame().broadcastActionBar(I18n.get().message("arena-bar-countdown",
+                    "{SECONDS}", TimeUnit.MILLISECONDS.toSeconds(getRealCountdownTime())));
 
             if (getRealCountdownTime() <= 0) {
                 this.countdown = false;
+                getGame().broadcastActionBar(I18n.get().message("arena-bar-started"));
                 onStart();
 
                 getArenaInfo().startTimer();
@@ -142,6 +155,15 @@ public abstract class Arena implements Listener {
                 }, 1, TimeUnit.SECONDS);
             }
         }, 1, TimeUnit.SECONDS);
+    }
+
+    private String getFancyName() {
+        String id = getArenaInfo().getName();
+
+        id = id.replace("-", " ");
+        id = MessageHelper.capitalize(id);
+
+        return id;
     }
 
     public long getRealCountdownTime() {
@@ -177,11 +199,28 @@ public abstract class Arena implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
+        if (!game.isPlaying(event.getPlayer()))
+            return;
+
+        if (!game.isArena(this))
+            return;
+
         if (isFreezed() && (event.getTo().getX() != event.getFrom().getX()
                 || event.getTo().getY() != event.getFrom().getY()
                 || event.getTo().getZ() != event.getFrom().getZ())) {
             event.setTo(event.getFrom());
         }
+    }
+
+    @EventHandler
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+        if (!game.isPlaying((Player) event.getEntity()))
+            return;
+
+        if (!game.isArena(this))
+            return;
+
+        event.setCancelled(true);
     }
 
     public ArenaInfo getArenaInfo() {

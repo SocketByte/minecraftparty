@@ -19,6 +19,10 @@ repositories {
         name = 'spigotmc-repo'
         url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
     }
+    maven {
+        name 'luca98-repo'
+        url 'https://dl.bintray.com/luca98/plugins/'
+    }
 }
 
 dependencies {
@@ -26,4 +30,5 @@ dependencies {
 
     compileOnly 'org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT'
     compile group: 'com.zaxxer', name: 'HikariCP', version: '3.2.0'
+    compile group: 'io.github.theluca98', name: 'TextAPI', version: '1.8.8-R2.0'
 }

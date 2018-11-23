@@ -31,8 +31,6 @@ public class Board {
         this.title = title;
         this.objective.setDisplayName(MessageHelper.fixColor(this.title));
         this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        System.out.println("Should update to : " + title);
-        System.out.println("Updated to : " + this.objective.getDisplayName());
     }
 
     public void setScore(String entry, int score) {

@@ -1,5 +1,6 @@
 package pl.socketbyte.minecraftparty.command.impl;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import pl.socketbyte.minecraftparty.MinecraftParty;
@@ -14,6 +15,11 @@ public class JoinGameCommand extends CommandInterface {
         String arena = args[0];
         Player player = (Player)sender;
 
-        Game.getController().join(player, arena);
+        if (!Game.getController().get(arena).isOccupied()) {
+            Game.getController().join(player, arena);
+        }
+        else {
+            player.sendMessage(ChatColor.RED + "This arena is occupied!");
+        }
     }
 }
