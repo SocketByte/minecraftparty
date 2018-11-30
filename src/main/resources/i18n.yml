@@ -1,11 +1,78 @@
+# Misc
 waiting-for-players: '&cPotrzeba jeszcze {PLAYERS} graczy do rozpoczecia gry...'
 game-starts: '&9Gra wystartuje za &3&l{TIME}&9...'
 player-joined: '&3Gracz &9{PLAYER} &3dolaczyl do gry. (&9{PLAYERS}&3/&9{MAX}&3)'
 player-left: '&3Gracz &9{PLAYER} &3opuscil gre. (&9{PLAYERS}&3/&9{MAX}&3)'
 gameboard-title: '&3Minecraft Party'
+
+# Arena messages
 arenaboard-title: '&8[&f{ARENA}&8/&f{ALL}&8] &r{TIME}'
-arenaboard-disq-info: 'Pozostali gracze:'
+arenaboard-disq-info: '&9Pozostali gracze:'
 arena-start-title: '&8&l*  &6{ARENA}  &8&l*'
 arena-start-prepare: '&7Przygotuj sie, arena wkrotce sie rozpocznie!'
 arena-bar-countdown: '&cArena rozpocznie sie za {SECONDS}s'
 arena-bar-started: '&aArena wystartowala!'
+arena-start-message:
+  - '&9&l======================================'
+  - '          &8Arena &3&l{ARENA}'
+  - '     &8Cel: &3{GOAL}'
+  - '     &8Porada: &3{TIP}'
+  - '&9&l======================================'
+arena-end-message:
+  - '&9&l======================================'
+  - ''
+  - '    &8Arena &3&l{ARENA} &8zakonczona!'
+  - ''
+  - '&9&l======================================'
+
+# Top arena message
+top-message:
+  - '          &8Rezultaty areny'
+  - '{TOP-1}'
+  - '{TOP-2}'
+  - '{TOP-3}'
+  - '   &8Twoje miejsce: &3{PLACE}'
+  - '   &8Twoj wynik: &3{SCORE} pkt'
+  - '&9&l======================================'
+top-disq-message:
+  - '          &8Rezultaty areny'
+  - '{TOP-1}'
+  - '{TOP-2}'
+  - '{TOP-3}'
+  - '   &8Twoje miejsce: &3{PLACE}'
+  - '&9&l======================================'
+top-format: '&3     {PLACE}&8. &9{PLAYER} &8(&3{SCORE}&8 pkt)'
+top-disq-format: '&3     {PLACE}&8. &9{PLAYER}'
+top-none: '&3     {PLACE}&8.'
+
+# Top total message
+top-total-message:
+  - '          &aRezultaty gry'
+  - '{TOP-1}'
+  - '{TOP-2}'
+  - '{TOP-3}'
+  - '   &8Twoje miejsce: &a{PLACE}'
+  - '   &8Twoj wynik: &a{SCORE} pkt'
+  - '&a&l======================================'
+top-total-format: '&a     {PLACE}&8. &2{PLAYER} &8(&a{SCORE}&8 pkt)'
+top-total-disq-format: '&a     {PLACE}&8. &2{PLAYER}'
+top-total-none: '&a     {PLACE}&8.'
+# Game info
+winner-broadcast:
+  - ''
+  - '&6&lGracz &6{PLAYER} &6&lwygrywa z &6{SCORE} &6&lpkt! Gratulujemy!'
+  - ''
+  - '&6&l======================================'
+
+# Arena info
+punch-the-bats:
+  goal: 'Napierdalaj w nietoperze do upadlego!'
+  tip: 'Kliknij dwa razy spacje aby zrobic double-jumpa!'
+  killed: '&3Zabiles nietoperza wartego &r{WORTH}'
+trampolinio:
+  goal: 'Skacz jak po dobrej wodce!'
+  tip: 'Zbieraj punkty by wygrac!'
+wool-mix-up:
+  goal: 'Stan na poprawnych kolorach a nikt nie zginie!'
+  tip: 'Spiesz sie, twoj czas jest ograniczony!'
+  died: '&cPrzykro mi, ale byles zbyt wolny!'

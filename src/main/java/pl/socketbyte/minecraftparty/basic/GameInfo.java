@@ -79,9 +79,7 @@ public class GameInfo {
             info.setCountdown(arenaSection.getInt("countdown"));
 
             ConfigurationSection dataSection = arenaSection.getConfigurationSection("data");
-            for (String dataKey : dataSection.getKeys(false)) {
-                info.addData(dataKey, dataSection.get(dataKey));
-            }
+            info.setData(dataSection);
 
             arenas.add(info);
         }

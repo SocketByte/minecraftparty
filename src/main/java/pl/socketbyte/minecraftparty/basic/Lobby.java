@@ -28,8 +28,10 @@ public class Lobby extends Thread {
         try {
             while (running && getPlayersNeeded() > 0) {
                 Thread.sleep(5000);
-                game.broadcast(I18n.get().message("waiting-for-players",
-                        "{PLAYERS}", getPlayersNeeded()));
+                if (getPlayersNeeded() > 0) {
+                    game.broadcast(I18n.get().message("waiting-for-players",
+                            "{PLAYERS}", getPlayersNeeded()));
+                }
             }
             // ye ye, I know, but it's easier in this case ;/
             game.broadcast(I18n.get().message("game-starts", "{TIME}", 15));

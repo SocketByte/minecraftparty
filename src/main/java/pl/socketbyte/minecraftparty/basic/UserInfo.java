@@ -64,7 +64,7 @@ public class UserInfo {
             player.getInventory().setHelmet(new ItemStack(Material.AIR));
             player.getInventory().setChestplate(new ItemStack(Material.AIR));
             player.getInventory().setLeggings(new ItemStack(Material.AIR));
-            player.setGameMode(GameMode.SURVIVAL);
+            player.setGameMode(GameMode.CREATIVE); // TODO: 24.11.2018 change to survival
         });
     }
 
@@ -85,6 +85,7 @@ public class UserInfo {
            player.getInventory().setHeldItemSlot(this.inventorySlot);
            player.getInventory().setContents(this.contents);
            player.getInventory().setArmorContents(this.armorContents);
+           player.teleport(this.location);
        });
     }
 

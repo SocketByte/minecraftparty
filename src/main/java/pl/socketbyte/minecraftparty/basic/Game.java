@@ -2,17 +2,21 @@ package pl.socketbyte.minecraftparty.basic;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import pl.socketbyte.minecraftparty.MinecraftParty;
 import pl.socketbyte.minecraftparty.basic.board.impl.GameBoard;
+import pl.socketbyte.minecraftparty.basic.func.DoubleJump;
 import pl.socketbyte.minecraftparty.commons.MessageHelper;
+import pl.socketbyte.minecraftparty.commons.SortHelper;
 import pl.socketbyte.minecraftparty.commons.TaskHelper;
 import pl.socketbyte.minecraftparty.commons.io.I18n;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Game extends Thread implements Listener {
 
@@ -64,15 +68,16 @@ public class Game extends Thread implements Listener {
     }
 
     public void dispose() {
-        this.running = false;
         this.lobby.dispose();
         this.board.dispose();
-        this.currentArena = null;
         this.playing.clear();
-        reset();
+        this.running = false;
     }
 
     private void reset() {
+        this.lobby.dispose();
+        this.board.dispose();
+        this.playing.clear();
         Game.getController().remove(this);
         Game.getController().create(this.id);
     }
@@ -133,6 +138,12 @@ public class Game extends Thread implements Listener {
 
         cache.apply(player);
 
+        DoubleJump.disable(player);
+
+        currentArena.remove(player);
+
+        player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+
         if (!endGame) {
             broadcast(I18n.get().message("player-left",
                     "{PLAYER}", player.getName(),
@@ -159,7 +170,29 @@ public class Game extends Thread implements Listener {
         }
     }
 
+    public Map<UUID, Integer> getPoints() {
+        return this.points;
+    }
+
+    public int getPlaceByScore(int score) {
+        int place = 0;
+        Map<UUID, Integer> sorted = SortHelper.sortByIntValue(getPoints());
+        int index = 0;
+        for (int i = 0; i < sorted.size(); i++) {
+            int sc = (int) sorted.values().toArray()[i];
+
+            if (sc == score) {
+                return i + 1;
+            }
+        }
+        return -1;
+    }
+
     public int getPoints(Player player) {
+        return this.points.get(player.getUniqueId());
+    }
+
+    public int getPoints(OfflinePlayer player) {
         return this.points.get(player.getUniqueId());
     }
 
@@ -193,18 +226,32 @@ public class Game extends Thread implements Listener {
     /**
      * Called when all arenas are finished
      */
+    @SuppressWarnings("unchecked")
     protected void end() {
-        // TODO: 23.10.2018 Broadcast some winning info etc
-        broadcast("Game ended!");
+        this.running = false;
 
-        for (Player player : getPlaying()) {
-            // TODO: 23.10.2018 Assign global XP points or something
+        Map<UUID, Integer> sorted = SortHelper.sortByIntValue(getPoints());
+        Map.Entry<UUID, Integer> entry = (Map.Entry<UUID, Integer>) sorted.entrySet().toArray()[0];
 
-            leave(player, true);
+        OfflinePlayer winner = Bukkit.getOfflinePlayer(entry.getKey());
+
+        for (String str : I18n.get().list("winner-broadcast")) {
+            broadcast(str
+                    .replace("{PLAYER}", winner.getName())
+                    .replace("{SCORE}", String.valueOf(entry.getValue())));
         }
 
-        // dispose and prepare for next game
-        dispose();
+        TaskHelper.delay(() -> {
+            for (Player player : getPlaying()) {
+                // TODO: 23.10.2018 Assign global XP points or something
+
+                leave(player, true);
+            }
+            this.currentArena = null;
+
+            // dispose and prepare for next game
+            reset();
+        }, 5, TimeUnit.SECONDS);
     }
 
     public void next() {
@@ -222,6 +269,7 @@ public class Game extends Thread implements Listener {
         currentArena = arenas.get(currentArenaIndex);
 
         teleportToLocations();
+        System.out.println("Started arena " + currentArena.getArenaInfo().getName());
         currentArena.start();
     }
 

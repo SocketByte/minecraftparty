@@ -2,6 +2,7 @@ package pl.socketbyte.minecraftparty.basic;
 
 import pl.socketbyte.minecraftparty.basic.arena.PunchTheBatsArena;
 import pl.socketbyte.minecraftparty.basic.arena.TrampolinioArena;
+import pl.socketbyte.minecraftparty.basic.arena.WoolMixupArena;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ public class ArenaContainer {
     static {
         arenaNames.put("punch-the-bats", PunchTheBatsArena.class);
         arenaNames.put("trampolinio", TrampolinioArena.class);
-
+        arenaNames.put("wool-mix-up", WoolMixupArena.class);
     }
 
     public static Arena createArenaInstance(Game game, String arenaName) {

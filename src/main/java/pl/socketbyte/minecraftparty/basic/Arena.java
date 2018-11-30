@@ -2,15 +2,21 @@ package pl.socketbyte.minecraftparty.basic;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitTask;
 import pl.socketbyte.minecraftparty.MinecraftParty;
 import pl.socketbyte.minecraftparty.basic.board.impl.ArenaBoard;
+import pl.socketbyte.minecraftparty.basic.board.impl.ArenaBoardType;
 import pl.socketbyte.minecraftparty.commons.MessageHelper;
+import pl.socketbyte.minecraftparty.commons.SortHelper;
 import pl.socketbyte.minecraftparty.commons.TaskHelper;
 import pl.socketbyte.minecraftparty.commons.io.I18n;
 
@@ -27,30 +33,70 @@ public abstract class Arena implements Listener {
     private boolean freeze = false;
     private boolean countdown = false;
 
+    private boolean pvp = false;
+
     private String fancyName;
 
     private long realCountdown;
 
+    public void setPvp(boolean pvp) {
+        this.pvp = pvp;
+    }
+
     /**
      * For storing dead/disqualified players per arena
      */
-    private final List<UUID> disqualifiedPlayers = new ArrayList<>();
+    private final Map<UUID, Long> disqualifiedPlayers = new HashMap<>();
 
     public void disqualify(Player player) {
-        this.disqualifiedPlayers.add(player.getUniqueId());
+        this.disqualifiedPlayers.put(player.getUniqueId(), System.currentTimeMillis());
+        TaskHelper.sync(() -> {
+            for (Player playing : getGame().getPlaying()) {
+                playing.hidePlayer(player);
+            }
+            player.setAllowFlight(true);
+            player.setFlying(true);
+        });
         this.board.update();
     }
 
     public boolean isDisqualified(Player player) {
-        return this.disqualifiedPlayers.contains(player.getUniqueId());
+        return this.disqualifiedPlayers.containsKey(player.getUniqueId());
+    }
+
+    public Map<UUID, Long> getDisqualifiedMap() {
+        return disqualifiedPlayers;
     }
 
     public List<Player> getDisqualifiedPlayers() {
         List<Player> list = new ArrayList<>();
-        for (UUID uuid : disqualifiedPlayers) {
+        for (UUID uuid : disqualifiedPlayers.keySet()) {
             list.add(Bukkit.getPlayer(uuid));
         }
         return list;
+    }
+
+    public int getPlayersLeft() {
+        List<Player> players = getGame().getPlaying();
+        List<Player> disqualifiedPlayers = getDisqualifiedPlayers();
+
+        return players.size() - disqualifiedPlayers.size();
+    }
+
+    public Player getLastPlayer() {
+        if (getPlayersLeft() > 1)
+            return null;
+
+        List<Player> players = getGame().getPlaying();
+        List<Player> disqualifiedPlayers = getDisqualifiedPlayers();
+
+        for (Player player : players) {
+            if (disqualifiedPlayers.contains(player)) {
+                continue;
+            }
+            return player;
+        }
+        return null;
     }
 
     /**
@@ -69,6 +115,25 @@ public abstract class Arena implements Listener {
 
     public Map<UUID, Integer> getInternalScores() {
         return this.internalScores;
+    }
+
+    public void remove(Player player) {
+        disqualifiedPlayers.remove(player.getUniqueId());
+        internalScores.remove(player.getUniqueId());
+    }
+
+    public int getPlaceByScore(int score) {
+        int place = 0;
+        Map<UUID, Integer> sorted = SortHelper.sortByIntValue(getInternalScores());
+        int index = 0;
+        for (int i = 0; i < sorted.size(); i++) {
+            int sc = (int) sorted.values().toArray()[i];
+
+            if (sc == score) {
+                return i + 1;
+            }
+        }
+        return -1;
     }
 
     private int id;
@@ -120,6 +185,12 @@ public abstract class Arena implements Listener {
         this.board.update();
         this.board.init();
 
+        for (String str : I18n.get().list("arena-start-message")) {
+            getGame().broadcast(str
+                    .replace("{ARENA}", this.fancyName)
+                    .replace("{GOAL}", I18n.get().message(getArenaInfo().getName() + ".goal"))
+                    .replace("{TIP}", I18n.get().message(getArenaInfo().getName() + ".tip")));
+        }
         onCountdown();
 
         getGame().broadcastTitle(
@@ -144,17 +215,199 @@ public abstract class Arena implements Listener {
                     if (isFreezed())
                         return;
 
-                    if (getArenaInfo().getTimeLeftAsSeconds() <= 0) {
-                        freeze();
-                        getTaskManager().delay(this::end, 5, TimeUnit.SECONDS);
-                        return;
-                    }
-
                     onTick(getArenaInfo().getTimeLeftAsSeconds());
                     this.board.update();
+
+                    if (getArenaInfo().getTimeLeftAsSeconds() <= 0) {
+                        for (Player player : getGame().getPlaying()) {
+                            if (isDisqualified(player)) {
+                                continue;
+                            }
+                            disqualify(player);
+                        }
+
+                        endArena();
+                    }
+                    else if (board.getType() == ArenaBoardType.DISQUALIFICATION) {
+                        Player lastPlayer = getLastPlayer();
+                        if (lastPlayer == null)
+                            return;
+
+                        disqualify(lastPlayer);
+
+                        endArena();
+                    }
                 }, 1, TimeUnit.SECONDS);
             }
         }, 1, TimeUnit.SECONDS);
+    }
+
+
+    @EventHandler
+    public void onDamage(EntityDamageByEntityEvent event) {
+        if (!getGame().isArena(this))
+            return;
+
+        if (pvp)
+            return;
+
+        Entity entity = event.getEntity();
+        Entity damager = event.getDamager();
+
+        if (!(entity instanceof Player))
+            return;
+
+        if (!(damager instanceof Player))
+            return;
+
+        Player player = (Player) entity;
+        Player attacker = (Player) damager;
+
+        if (!getGame().isPlaying(player))
+            return;
+
+        if (!getGame().isPlaying(attacker))
+            return;
+
+        event.setCancelled(true);
+    }
+
+
+    private void endArena() {
+        for (Player player : getGame().getPlaying()) {
+            int place = getPlaceByScore(getInternalScore(player));
+            switch (place) {
+                case 1:
+                    getGame().addPoints(player, 3);
+                    break;
+                case 2:
+                    getGame().addPoints(player, 2);
+                    break;
+                case 3:
+                    getGame().addPoints(player, 1);
+                    break;
+            }
+        }
+
+        freeze();
+
+        for (String str0 : I18n.get().list("arena-end-message")) {
+            getGame().broadcast(str0.replace("{ARENA}", this.fancyName));
+        }
+
+        String topMessage = getBoard().getType() == ArenaBoardType.SCORES ? "top-message" : "top-disq-message";
+        for (Player player : getGame().getPlaying()) {
+            for (String str : I18n.get().list(topMessage)) {
+                str = replaceTops(str);
+
+                MessageHelper.send(player, str
+                        .replace("{PLACE}", String.valueOf(getPlaceByScore(getInternalScore(player))))
+                        .replace("{SCORE}", String.valueOf(getInternalScore(player))));
+            }
+        }
+
+        getTaskManager().delay(() -> {
+            for (Player player : getGame().getPlaying()) {
+                for (String str : I18n.get().list("top-total-message")) {
+                    str = replaceGameTops(str);
+
+                    MessageHelper.send(player, str
+                            .replace("{SCORE}", String.valueOf(getGame().getPoints(player)))
+                            .replace("{PLACE}", String.valueOf(getGame().getPlaceByScore(getGame().getPoints(player)))));
+                }
+            }
+
+            getTaskManager().delay(() -> {
+                end();
+
+                TaskHelper.sync(() -> {
+                    for (Player playing : getGame().getPlaying()) {
+                        for (Player player : getDisqualifiedPlayers()) {
+                            playing.showPlayer(player);
+                            player.setFlying(false);
+                            player.setAllowFlight(false);
+                        }
+                    }
+                });
+            }, 5, TimeUnit.SECONDS);
+        }, 5, TimeUnit.SECONDS);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected String replaceGameTops(String str) {
+        for (int i = 0; i < 3; i++) {
+            int place = i + 1;
+            Map<UUID, Integer> sorted = SortHelper.sortByIntValue(this.getGame().getPoints());
+            if (i >= sorted.size()) {
+                str = str.replace("{TOP-" + place + "}",
+                        I18n.get().message("top-total-none",
+                                "{PLACE}", String.valueOf(place)));
+                continue;
+            }
+            Map.Entry<UUID, Integer> entry = (Map.Entry<UUID, Integer>)
+                    sorted.entrySet().toArray()[i];
+
+            OfflinePlayer plr = Bukkit.getOfflinePlayer(entry.getKey());
+
+            str = str.replace("{TOP-" + place + "}",
+                    I18n.get().message("top-total-format",
+                            "{PLACE}", String.valueOf(place),
+                            "{SCORE}", String.valueOf(getGame().getPoints(plr)),
+                            "{PLAYER}", plr.getName()));
+        }
+        return str;
+    }
+
+    @SuppressWarnings("unchecked")
+    public String replaceTops(String str) {
+        switch (getBoard().getType()) {
+            case DISQUALIFICATION: {
+                for (int i = 0; i < 3; i++) {
+                    int place = i + 1;
+                    Map<UUID, Long> sorted = SortHelper.sortByLongValue(getDisqualifiedMap());
+                    if (i >= sorted.size()) {
+                        str = str.replace("{TOP-" + place + "}",
+                                I18n.get().message("top-none",
+                                        "{PLACE}", String.valueOf(place)));
+                        continue;
+                    }
+                    Map.Entry<UUID, Integer> entry = (Map.Entry<UUID, Integer>)
+                            sorted.entrySet().toArray()[i];
+
+                    OfflinePlayer plr = Bukkit.getOfflinePlayer(entry.getKey());
+
+                    str = str.replace("{TOP-" + place + "}",
+                            I18n.get().message("top-disq-format",
+                                    "{PLACE}", String.valueOf(place),
+                                    "{PLAYER}", plr.getName()));
+                }
+                break;
+            }
+            case SCORES: {
+                for (int i = 0; i < 3; i++) {
+                    int place = i + 1;
+                    Map<UUID, Integer> sorted = SortHelper.sortByIntValue(getInternalScores());
+                    if (i >= sorted.size()) {
+                        str = str.replace("{TOP-" + place + "}",
+                                I18n.get().message("top-none",
+                                        "{PLACE}", String.valueOf(place)));
+                        continue;
+                    }
+                    Map.Entry<UUID, Integer> entry = (Map.Entry<UUID, Integer>)
+                            sorted.entrySet().toArray()[i];
+
+                    OfflinePlayer plr = Bukkit.getOfflinePlayer(entry.getKey());
+
+                    str = str.replace("{TOP-" + place + "}",
+                            I18n.get().message("top-format",
+                                    "{PLACE}", String.valueOf(place),
+                                    "{PLAYER}", plr.getName(),
+                                    "{SCORE}", String.valueOf(entry.getValue())));
+                }
+                break;
+            }
+        }
+        return str;
     }
 
     private String getFancyName() {

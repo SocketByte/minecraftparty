@@ -1,6 +1,8 @@
 package pl.socketbyte.minecraftparty.basic;
 
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +17,7 @@ public class ArenaInfo {
 
     private String name;
 
-    private Map<String, Object> data = new HashMap<>();
+    private ConfigurationSection data;
 
     public void startTimer() {
         this.time = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(this.defaultTime);
@@ -57,15 +59,11 @@ public class ArenaInfo {
         return time;
     }
 
-    public Map<String, Object> getData() {
+    public ConfigurationSection getData() {
         return data;
     }
 
-    public void addData(String key, Object object) {
-        this.data.put(key, object);
-    }
-
-    public void setData(Map<String, Object> data) {
+    public void setData(ConfigurationSection data) {
         this.data = data;
     }
 

@@ -1,22 +1,68 @@
 package pl.socketbyte.minecraftparty.basic.arena;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.Vector;
+import pl.socketbyte.minecraftparty.MinecraftParty;
 import pl.socketbyte.minecraftparty.basic.Arena;
 import pl.socketbyte.minecraftparty.basic.Game;
+import pl.socketbyte.minecraftparty.basic.arena.misc.Baloon;
+import pl.socketbyte.minecraftparty.basic.arena.misc.BaloonData;
+import pl.socketbyte.minecraftparty.basic.arena.misc.BaloonType;
 import pl.socketbyte.minecraftparty.basic.board.impl.ArenaBoardType;
+import pl.socketbyte.minecraftparty.commons.MessageHelper;
 import pl.socketbyte.minecraftparty.commons.RandomHelper;
 import pl.socketbyte.minecraftparty.commons.TaskHelper;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class TrampolinioArena extends Arena {
 
+    private int radius;
+    private int target;
+
+    private boolean jumping = false;
+
+    private List<Baloon> baloons = new CopyOnWriteArrayList<>();
+    private Map<BaloonType, Double> chances = new HashMap<>();
+    private Map<BaloonType, BaloonData> dataMap = new HashMap<>();
+
     public TrampolinioArena(Game game) {
         super(game);
+    }
+
+    public void readBaloonData() {
+        ConfigurationSection info = getArenaInfo().getData().getConfigurationSection("info");
+
+        for (String key : info.getKeys(false)) {
+            ConfigurationSection section = info.getConfigurationSection(key);
+
+            BaloonData baloon = new BaloonData(BaloonType.valueOf(key.toUpperCase()));
+            baloon.setChance(section.getDouble("chance"));
+            baloon.setMinY(section.getInt("height.min"));
+            baloon.setMaxY(section.getInt("height.max"));
+            baloon.setTitle(MessageHelper.fixColor(section.getString("title")));
+
+            chances.put(baloon.getType(), baloon.getChance());
+            dataMap.put(baloon.getType(), baloon);
+        }
     }
 
     @Override
@@ -27,36 +73,66 @@ public class TrampolinioArena extends Arena {
 
     @Override
     public void onCountdown() {
-        getGame().broadcast("&aArena Trampolinio will start in few seconds...");
+
     }
 
     @Override
     public void onTick(long timeLeft) {
-        getGame().broadcast("&aArena Trampolinio ends in " + timeLeft + " seconds.");
-    }
-
-    @Override
-    public void onFreeze() {
-        for (Player player : getGame().getPlaying()) {
-            getGame().addPoints(player, 1000);
+        if (baloons.size() != target) {
+            spawn(target - baloons.size());
         }
-        getGame().broadcast("&aArena Trampolinio freezed.");
     }
 
-    @Override
-    public void onInit() {
-        getGame().broadcast("&aArena Trampolinio initialized!");
-        this.getBoard().setType(ArenaBoardType.DISQUALIFICATION);
+    private Map<BaloonType, Integer> amounts = new ConcurrentHashMap<>();
+    private void countAll() {
+        amounts.clear();
+        for (BaloonType type : BaloonType.values()) {
+            amounts.put(type, 0);
+        }
+        for (Baloon baloon : baloons) {
+            amounts.put(baloon.getData().getType(), amounts.get(baloon.getData().getType()) + 1);
+        }
     }
 
-    @Override
-    public void onStart() {
-        getGame().broadcast("&aArena Trampolinio started!");
-    }
+    public void spawn(int amount) {
+        for (int i = 0; i < amount; i++) {
+            BaloonType pick = RandomHelper.pick(chances);
+            if (pick == null) {
+                continue;
+            }
+            BaloonData data = dataMap.get(pick);
 
-    @Override
-    public void onEnd() {
-        getGame().broadcast("&aArena Trampolinio ended!");
+            Location location = randomizeLocation(data);
+            boolean cancel = false;
+            for (Baloon baloon : baloons) {
+                if (baloon.getLocation().equals(location)) {
+                    cancel = true;
+                    break;
+                }
+            }
+            if (cancel)
+                continue;
+
+            int limit = data.getType().getDivideLimit();
+            int typeAmount = amounts.get(data.getType());
+            int realLimit;
+            int boosterAmount = amounts.get(BaloonType.BOOSTER);
+            if (boosterAmount < 1) {
+                data = dataMap.get(BaloonType.BOOSTER);
+            }
+            else if (limit != 0) {
+                realLimit = baloons.size() / limit;
+
+                if (typeAmount >= realLimit)
+                    continue;
+            }
+
+            Baloon baloon = new Baloon(data);
+            baloon.setLocation(location);
+            baloon.place();
+            baloons.add(baloon);
+            countAll();
+        }
     }
 
     @EventHandler
@@ -67,6 +143,106 @@ public class TrampolinioArena extends Arena {
         if (!getGame().isArena(this))
             return;
 
-        getGame().broadcast("&aBlock break in arena Trampolinio!");
+        event.setCancelled(true);
     }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (!getGame().isPlaying(event.getPlayer()))
+            return;
+
+        if (!getGame().isArena(this))
+            return;
+
+        Player player = event.getPlayer();
+
+        TaskHelper.async(() -> {
+            if (jumping) {
+                if (!player.getLocation().clone().subtract(0, 1, 0)
+                        .getBlock().getType().equals(Material.AIR)) {
+                    player.setVelocity(player.getLocation().getDirection().multiply(new Vector(0.5, 1, 0.5)).setY(0.8));
+                }
+            }
+
+            for (Baloon baloon : baloons) {
+                if (baloon.isColliding(player.getLocation())) {
+                    baloon.kill();
+
+                    addInternalScore(player, baloon.getData().getPoints());
+                    MessageHelper.send(player, baloon.getData().getTitle());
+
+                    baloons.remove(baloon);
+
+                    if (baloon.getData().getType() == BaloonType.BOOSTER) {
+                        player.setVelocity(player.getLocation().getDirection().setY(1.4));
+                    }
+                }
+            }
+        });
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onEntityDamageEvent(final EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof Player)) {
+            return;
+        }
+        if (!getGame().isPlaying((Player) e.getEntity()))
+            return;
+
+        if (!getGame().isArena(this))
+            return;
+        Player p = (Player) e.getEntity();
+        if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
+            e.setCancelled(true);
+        }
+    }
+
+    public Location randomizeLocation(BaloonData data) {
+        Location location = getArenaInfo().getDefaultLocation().clone();
+
+        int randomX = RandomHelper.randomInteger(-radius, radius);
+        int randomY = RandomHelper.randomInteger(data.getMinY(), data.getMaxY());
+        int randomZ = RandomHelper.randomInteger(-radius, radius);
+
+        location.add(randomX, randomY, randomZ);
+
+        return location;
+    }
+
+    @Override
+    public void onFreeze() {
+        this.jumping = false;
+        for (Baloon baloon : baloons) {
+            baloon.kill();
+        }
+    }
+
+    @Override
+    public void onInit() {
+        this.getBoard().setType(ArenaBoardType.SCORES);
+
+        this.radius = getArenaInfo().getData().getInt("radius");
+        this.target = getArenaInfo().getData().getInt("target");
+        readBaloonData();
+    }
+
+    @EventHandler
+    public void onSandFall(EntityChangeBlockEvent event){
+        if (!getGame().isArena(this))
+            return;
+
+        event.setCancelled(true);
+        event.getBlock().getState().update(false, false);
+    }
+
+    @Override
+    public void onStart() {
+        this.jumping = true;
+    }
+
+    @Override
+    public void onEnd() {
+
+    }
+
 }

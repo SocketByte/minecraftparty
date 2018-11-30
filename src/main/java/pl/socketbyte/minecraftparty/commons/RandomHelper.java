@@ -5,11 +5,30 @@ import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomHelper {
 
     private RandomHelper() {
+    }
+
+    public static boolean chance(double chance) {
+        double normalized = chance / 100.0;
+
+        return Math.random() < normalized;
+    }
+
+    public static <T> T pick(Map<T, Double> map) {
+        double p = Math.random() * 100.0;
+        double cumulativeProbability = 0.0;
+        for (Map.Entry<T, Double> entry : map.entrySet()) {
+            cumulativeProbability += entry.getValue();
+            if (p <= cumulativeProbability && entry.getValue() != 0) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     public static List<Location> createRandomLocations(World world, double min, double max, double height, int size) {
