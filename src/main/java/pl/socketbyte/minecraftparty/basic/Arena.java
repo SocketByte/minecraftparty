@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -49,7 +50,11 @@ public abstract class Arena implements Listener {
     private final Map<UUID, Long> disqualifiedPlayers = new HashMap<>();
 
     public void disqualify(Player player) {
-        this.disqualifiedPlayers.put(player.getUniqueId(), System.currentTimeMillis());
+        disqualify(player, System.currentTimeMillis());
+    }
+
+    public void disqualify(Player player, long time) {
+        this.disqualifiedPlayers.put(player.getUniqueId(), time);
         TaskHelper.sync(() -> {
             for (Player playing : getGame().getPlaying()) {
                 playing.hidePlayer(player);
@@ -74,6 +79,10 @@ public abstract class Arena implements Listener {
             list.add(Bukkit.getPlayer(uuid));
         }
         return list;
+    }
+
+    public long getDisqualifiedTime(Player player) {
+        return disqualifiedPlayers.get(player.getUniqueId());
     }
 
     public int getPlayersLeft() {
@@ -109,6 +118,11 @@ public abstract class Arena implements Listener {
         this.board.update();
     }
 
+    public void setInternalScore(Player player, int points) {
+        this.internalScores.put(player.getUniqueId(), points);
+        this.board.update();
+    }
+
     public int getInternalScore(Player player) {
         return this.internalScores.get(player.getUniqueId());
     }
@@ -130,6 +144,21 @@ public abstract class Arena implements Listener {
             int sc = (int) sorted.values().toArray()[i];
 
             if (sc == score) {
+                return i + 1;
+            }
+        }
+        return -1;
+    }
+
+
+    public int getPlaceByTime(long time) {
+        int place = 0;
+        Map<UUID, Long> sorted = SortHelper.sortByLongValue(getDisqualifiedMap());
+        int index = 0;
+        for (int i = 0; i < sorted.size(); i++) {
+            long sc = (long) sorted.values().toArray()[i];
+
+            if (sc == time) {
                 return i + 1;
             }
         }
@@ -191,6 +220,16 @@ public abstract class Arena implements Listener {
                     .replace("{GOAL}", I18n.get().message(getArenaInfo().getName() + ".goal"))
                     .replace("{TIP}", I18n.get().message(getArenaInfo().getName() + ".tip")));
         }
+        TaskHelper.sync(() -> {
+            for (Player playing : getGame().getPlaying()) {
+                for (Player player : getGame().getPlaying()) {
+                    playing.showPlayer(player);
+                    player.showPlayer(playing);
+                }
+                playing.setFlying(false);
+                playing.setAllowFlight(false);
+            }
+        });
         onCountdown();
 
         getGame().broadcastTitle(
@@ -228,12 +267,12 @@ public abstract class Arena implements Listener {
 
                         endArena();
                     }
-                    else if (board.getType() == ArenaBoardType.DISQUALIFICATION) {
+                    else {
                         Player lastPlayer = getLastPlayer();
                         if (lastPlayer == null)
                             return;
 
-                        disqualify(lastPlayer);
+                        disqualify(lastPlayer, Long.MAX_VALUE);
 
                         endArena();
                     }
@@ -272,10 +311,13 @@ public abstract class Arena implements Listener {
         event.setCancelled(true);
     }
 
-
     private void endArena() {
         for (Player player : getGame().getPlaying()) {
-            int place = getPlaceByScore(getInternalScore(player));
+            int place;
+            if (getBoard().getType() == ArenaBoardType.DISQUALIFICATION) {
+                place = getPlaceByTime(getDisqualifiedTime(player));
+            }
+            else place = getPlaceByScore(getInternalScore(player));
             switch (place) {
                 case 1:
                     getGame().addPoints(player, 3);
@@ -300,8 +342,14 @@ public abstract class Arena implements Listener {
             for (String str : I18n.get().list(topMessage)) {
                 str = replaceTops(str);
 
+                int place;
+                if (getBoard().getType() == ArenaBoardType.DISQUALIFICATION) {
+                    place = getPlaceByTime(getDisqualifiedTime(player));
+                }
+                else place = getPlaceByScore(getInternalScore(player));
+
                 MessageHelper.send(player, str
-                        .replace("{PLACE}", String.valueOf(getPlaceByScore(getInternalScore(player))))
+                        .replace("{PLACE}", String.valueOf(place))
                         .replace("{SCORE}", String.valueOf(getInternalScore(player))));
             }
         }
@@ -317,19 +365,7 @@ public abstract class Arena implements Listener {
                 }
             }
 
-            getTaskManager().delay(() -> {
-                end();
-
-                TaskHelper.sync(() -> {
-                    for (Player playing : getGame().getPlaying()) {
-                        for (Player player : getDisqualifiedPlayers()) {
-                            playing.showPlayer(player);
-                            player.setFlying(false);
-                            player.setAllowFlight(false);
-                        }
-                    }
-                });
-            }, 5, TimeUnit.SECONDS);
+            getTaskManager().delay(this::end, 5, TimeUnit.SECONDS);
         }, 5, TimeUnit.SECONDS);
     }
 

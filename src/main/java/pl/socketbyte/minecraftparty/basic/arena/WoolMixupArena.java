@@ -6,24 +6,21 @@ import com.sk89q.worldedit.EditSession;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-import org.slf4j.spi.LocationAwareLogger;
 import pl.socketbyte.minecraftparty.basic.Arena;
 import pl.socketbyte.minecraftparty.basic.Game;
-import pl.socketbyte.minecraftparty.basic.arena.misc.WoolCell;
+import pl.socketbyte.minecraftparty.basic.arena.helper.woolmixup.WoolCell;
 import pl.socketbyte.minecraftparty.basic.board.impl.ArenaBoardType;
 import pl.socketbyte.minecraftparty.commons.ConfigHelper;
 import pl.socketbyte.minecraftparty.commons.MessageHelper;
@@ -122,7 +119,7 @@ public class WoolMixupArena extends Arena {
             excludeExcept(currentColor);
 
             TaskHelper.delay(() -> {
-                if (baseTime > 2) {
+                if (baseTime > 1) {
                     baseTime--;
                 }
                 waveInProgress = false;
@@ -184,6 +181,29 @@ public class WoolMixupArena extends Arena {
 
         event.setCancelled(true);
     }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (!getGame().isPlaying(event.getPlayer()))
+            return;
+
+        if (!getGame().isArena(this))
+            return;
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (!getGame().isPlaying(event.getPlayer()))
+            return;
+
+        if (!getGame().isArena(this))
+            return;
+
+        event.setCancelled(true);
+    }
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!getGame().isPlaying(event.getPlayer()))

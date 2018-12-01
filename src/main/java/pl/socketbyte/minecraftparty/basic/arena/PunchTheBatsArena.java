@@ -1,28 +1,22 @@
 package pl.socketbyte.minecraftparty.basic.arena;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import pl.socketbyte.minecraftparty.basic.Arena;
-import pl.socketbyte.minecraftparty.basic.ArenaInfo;
 import pl.socketbyte.minecraftparty.basic.Game;
-import pl.socketbyte.minecraftparty.basic.arena.misc.ArenaBat;
+import pl.socketbyte.minecraftparty.basic.arena.helper.punchthebats.ArenaBat;
 import pl.socketbyte.minecraftparty.basic.board.impl.ArenaBoardType;
 import pl.socketbyte.minecraftparty.basic.func.DoubleJump;
 import pl.socketbyte.minecraftparty.commons.MessageHelper;
 import pl.socketbyte.minecraftparty.commons.RandomHelper;
-import pl.socketbyte.minecraftparty.commons.TaskHelper;
 import pl.socketbyte.minecraftparty.commons.io.I18n;
 
 import java.util.HashMap;
@@ -30,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class PunchTheBatsArena extends Arena {
     public PunchTheBatsArena(Game game) {

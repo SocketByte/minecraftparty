@@ -1,17 +1,14 @@
-package pl.socketbyte.minecraftparty.basic.arena.misc;
+package pl.socketbyte.minecraftparty.basic.arena.helper.woolmixup;
 
-import com.boydti.fawe.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.blocks.ImmutableBlock;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class WoolCell {

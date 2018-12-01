@@ -1,14 +1,8 @@
-package pl.socketbyte.minecraftparty.basic.arena.misc;
+package pl.socketbyte.minecraftparty.basic.arena.helper.trampolinio;
 
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.*;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-
-import java.util.List;
 
 public class Baloon {
 

@@ -76,3 +76,22 @@ wool-mix-up:
   goal: 'Stan na poprawnych kolorach a nikt nie zginie!'
   tip: 'Spiesz sie, twoj czas jest ograniczony!'
   died: '&cPrzykro mi, ale byles zbyt wolny!'
+chicken-game:
+  goal: 'Po prostu zabijaj zwierzeta!'
+  tip: 'Tylko nie bij tych z ujemnymi punktami!'
+horse-race:
+  goal: 'Wio koniku!'
+  tip: 'Im szybciej tym lepiej!'
+  dont-leave: '&cNie wyjezdzaj poza tor!'
+minefield:
+  goal: 'Przejdz jak najdalej (oraz jak najszybciej) do konca mapy!'
+  tip: 'Unikaj min, bo wybuchniesz!'
+  died: '&cWybuchles!'
+  win: '&a&lGracz {PLAYER} doszedl do samego konca pola minowego!'
+diamond-mine:
+  goal: 'Wykop jak najwiecej diamentow!'
+  tip: 'Wkop sie w ziemie!'
+spleef:
+  goal: 'Podkop innych graczy!'
+  tip: 'Badz taktyczny!'
+  died: '&cKtos cie podkopal!'

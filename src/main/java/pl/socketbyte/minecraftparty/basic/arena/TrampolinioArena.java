@@ -1,37 +1,31 @@
 package pl.socketbyte.minecraftparty.basic.arena;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
-import pl.socketbyte.minecraftparty.MinecraftParty;
 import pl.socketbyte.minecraftparty.basic.Arena;
 import pl.socketbyte.minecraftparty.basic.Game;
-import pl.socketbyte.minecraftparty.basic.arena.misc.Baloon;
-import pl.socketbyte.minecraftparty.basic.arena.misc.BaloonData;
-import pl.socketbyte.minecraftparty.basic.arena.misc.BaloonType;
+import pl.socketbyte.minecraftparty.basic.arena.helper.trampolinio.Baloon;
+import pl.socketbyte.minecraftparty.basic.arena.helper.trampolinio.BaloonData;
+import pl.socketbyte.minecraftparty.basic.arena.helper.trampolinio.BaloonType;
 import pl.socketbyte.minecraftparty.basic.board.impl.ArenaBoardType;
 import pl.socketbyte.minecraftparty.commons.MessageHelper;
 import pl.socketbyte.minecraftparty.commons.RandomHelper;
 import pl.socketbyte.minecraftparty.commons.TaskHelper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class TrampolinioArena extends Arena {
 
@@ -95,6 +89,7 @@ public class TrampolinioArena extends Arena {
     }
 
     public void spawn(int amount) {
+        countAll();
         for (int i = 0; i < amount; i++) {
             BaloonType pick = RandomHelper.pick(chances);
             if (pick == null) {

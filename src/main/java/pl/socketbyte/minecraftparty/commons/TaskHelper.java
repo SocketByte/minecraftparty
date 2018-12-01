@@ -30,8 +30,8 @@ public class TaskHelper {
         return scheduler.runTaskTimer(MinecraftParty.getInstance(), runnable, period, toTicks(period, unit));
     }
 
-    public static BukkitTask scheduleFast(Runnable runnable) {
-        return scheduler.runTaskTimer(MinecraftParty.getInstance(), runnable, 1, 1);
+    public static BukkitTask schedule(Runnable runnable, long ticks) {
+        return scheduler.runTaskTimer(MinecraftParty.getInstance(), runnable, 0, ticks);
     }
 
     private static long toTicks(long time, TimeUnit unit) {

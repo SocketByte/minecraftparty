@@ -9,13 +9,160 @@ games:
     max-players: 8 # maksymalna ilosc graczy
     start-threshold: 1 # minimalna ilosc graczy do rozpoczecia gry
     arenas: # konfiguracja aren
+      minefield:
+        spawn-location:
+          world: world
+          x: 3458
+          y: 99
+          z: 3500
+        time: 70
+        countdown: 10
+        data:
+          probability: 30
+          locations:
+            min:
+              x: 3460
+              y: 100
+              z: 3460
+            max:
+              x: 3540
+              y: 100
+              z: 3540
+      spleef:
+        spawn-location:
+          world: world
+          x: 4500
+          y: 101
+          z: 4500
+        time: 100
+        countdown: 10
+        data:
+          locations:
+            min:
+              x: 4470
+              y: 100
+              z: 4470
+            max:
+              x: 4530
+              y: 100
+              z: 4530
+      diamond-mine:
+        spawn-location:
+          world: world
+          x: 4000
+          y: 215
+          z: 4000
+        time: 60
+        countdown: 10
+        data:
+          probability: 20
+          locations:
+            min:
+              x: 3985
+              y: 185
+              z: 3985
+            max:
+              x: 4015
+              y: 215
+              z: 4015
+      horse-race:
+        spawn-location:
+          world: world
+          x: 3000
+          y: 100
+          z: 3000
+        time: 70
+        countdown: 10
+        data:
+          checkpoint-locations:
+            1:
+              x: 3032
+              y: 102
+              z: 3006
+            2:
+              x: 3025
+              y: 102
+              z: 3049
+            3:
+              x: 2986
+              y: 102
+              z: 3042
+            4:
+              x: 2994
+              y: 102
+              z: 2999
+      chicken-game:
+        spawn-location:
+          world: world
+          x: 2500
+          y: 100
+          z: 2500
+        time: 60
+        countdown: 10
+        data:
+          radius: 7
+          amount: 15
+          chicken:
+            chance: 90
+            health: 1
+            minus:
+              title: '&c&l-5 punktow'
+              points: -5
+            plus:
+              title: '&f&l1 punkt'
+              points: 1
+          cow:
+            chance: 10
+            health: 10
+            minus:
+              title: '&c&l-10 punktow'
+              points: -10
+            plus:
+              title: '&6&l3 punkty'
+              points: 3
+      trampolinio:
+        spawn-location:
+          world: world
+          x: 1500
+          y: 101
+          z: 1500
+        time: 70
+        countdown: 10
+        data:
+          radius: 6
+          target: 15
+          info:
+            booster:
+              chance: 10
+              height:
+                min: 1
+                max: 3
+              title: '&f&lBooster'
+            high:
+              chance: 20
+              height:
+                min: 5
+                max: 7
+              title: '&c&l+10 pkt'
+            medium:
+              chance: 30
+              height:
+                min: 2
+                max: 4
+              title: '&6&l+3 pkt'
+            low:
+              chance: 40
+              height:
+                min: 1
+                max: 3
+              title: '&a&l+1 pkt'
       punch-the-bats: # nazwa areny
         spawn-location: # polozenie spawnu na arenie dla graczy
           world: world
           x: 1000
           y: 100
           z: 1000
-        time: 80 # czas trwania areny w sekundach
+        time: 60 # czas trwania areny w sekundach
         countdown: 10 # czas odliczania do startu areny w sekundach
         data: # dodatkowe informacje o iearenie, sa rozne na kazdej (!)
           bats: 50
@@ -69,39 +216,3 @@ games:
               x: 2040
               y: 100
               z: 2040
-      trampolinio:
-        spawn-location:
-          world: world
-          x: 1500
-          y: 100
-          z: 1500
-        time: 20
-        countdown: 10
-        data:
-          radius: 6
-          target: 15
-          info:
-            booster:
-              chance: 10
-              height:
-                min: 1
-                max: 3
-              title: '&f&lBooster'
-            high:
-              chance: 20
-              height:
-                min: 5
-                max: 7
-              title: '&c&l+10 pkt'
-            medium:
-              chance: 30
-              height:
-                min: 2
-                max: 4
-              title: '&6&l+3 pkt'
-            low:
-              chance: 40
-              height:
-                min: 1
-                max: 3
-              title: '&a&l+1 pkt'

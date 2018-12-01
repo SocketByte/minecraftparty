@@ -1,4 +1,4 @@
-package pl.socketbyte.minecraftparty.basic.arena.misc;
+package pl.socketbyte.minecraftparty.basic.arena.helper.trampolinio;
 
 import org.bukkit.Material;
 

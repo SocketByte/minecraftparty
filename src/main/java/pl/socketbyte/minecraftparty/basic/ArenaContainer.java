@@ -1,8 +1,6 @@
 package pl.socketbyte.minecraftparty.basic;
 
-import pl.socketbyte.minecraftparty.basic.arena.PunchTheBatsArena;
-import pl.socketbyte.minecraftparty.basic.arena.TrampolinioArena;
-import pl.socketbyte.minecraftparty.basic.arena.WoolMixupArena;
+import pl.socketbyte.minecraftparty.basic.arena.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -16,6 +14,15 @@ public class ArenaContainer {
         arenaNames.put("punch-the-bats", PunchTheBatsArena.class);
         arenaNames.put("trampolinio", TrampolinioArena.class);
         arenaNames.put("wool-mix-up", WoolMixupArena.class);
+        arenaNames.put("chicken-game", ChickenGameArena.class);
+        arenaNames.put("horse-race", HorseRaceArena.class);
+        arenaNames.put("minefield", MinefieldArena.class);
+        arenaNames.put("diamond-mine", DiamondMineArena.class);
+        arenaNames.put("spleef", SpleefArena.class);
+    }
+
+    public static void addArena(String arenaName, Class<? extends Arena> arenaClass) {
+        arenaNames.put(arenaName, arenaClass);
     }
 
     public static Arena createArenaInstance(Game game, String arenaName) {

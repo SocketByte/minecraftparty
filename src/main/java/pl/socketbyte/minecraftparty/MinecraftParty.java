@@ -4,7 +4,7 @@ import net.minecraft.server.v1_8_R3.EntityFallingBlock;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.socketbyte.minecraftparty.basic.Game;
-import pl.socketbyte.minecraftparty.basic.arena.misc.BaloonEntity;
+import pl.socketbyte.minecraftparty.basic.arena.helper.trampolinio.BaloonEntity;
 import pl.socketbyte.minecraftparty.basic.data.Connector;
 import pl.socketbyte.minecraftparty.basic.data.ModelPersistence;
 import pl.socketbyte.minecraftparty.basic.func.DoubleJump;

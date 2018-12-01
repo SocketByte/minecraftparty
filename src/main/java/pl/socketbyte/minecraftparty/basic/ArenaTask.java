@@ -22,6 +22,10 @@ public class ArenaTask {
         tasks.add(TaskHelper.schedule(runnable, period, unit));
     }
 
+    public void schedule(Runnable runnable, long ticks) {
+        tasks.add(TaskHelper.schedule(runnable, ticks));
+    }
+
     public void delay(Runnable runnable, long delay, TimeUnit unit) {
         tasks.add(TaskHelper.delay(runnable, delay, unit));
     }

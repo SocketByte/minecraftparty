@@ -1,4 +1,4 @@
-package pl.socketbyte.minecraftparty.basic.arena.misc;
+package pl.socketbyte.minecraftparty.basic.arena.helper.punchthebats;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Bat;
