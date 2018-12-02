@@ -40,6 +40,12 @@ public abstract class Arena implements Listener {
 
     private long realCountdown;
 
+    private boolean infiniteHealth;
+
+    public void setInfiniteHealth(boolean infiniteHealth) {
+        this.infiniteHealth = infiniteHealth;
+    }
+
     public void setPvp(boolean pvp) {
         this.pvp = pvp;
     }
@@ -287,14 +293,18 @@ public abstract class Arena implements Listener {
         if (!getGame().isArena(this))
             return;
 
-        if (pvp)
+        if (!(event.getEntity() instanceof Player))
             return;
+
+        if (pvp) {
+            if (infiniteHealth) {
+                ((Player) event.getEntity()).setHealth(20);
+            }
+            return;
+        }
 
         Entity entity = event.getEntity();
         Entity damager = event.getDamager();
-
-        if (!(entity instanceof Player))
-            return;
 
         if (!(damager instanceof Player))
             return;

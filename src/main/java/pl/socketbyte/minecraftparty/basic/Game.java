@@ -274,13 +274,15 @@ public class Game extends Thread implements Listener {
     }
 
     private void teleportToLocations() {
-        int currentLoc = 0;
-        for (Player player : getPlaying()) {
-            Location location = currentArena.getPlayerStartPositions().get(currentLoc);
-            player.getInventory().clear();
-            player.teleport(location);
-            currentLoc++;
-        }
+        TaskHelper.sync(() -> {
+            int currentLoc = 0;
+            for (Player player : getPlaying()) {
+                Location location = currentArena.getPlayerStartPositions().get(currentLoc);
+                player.getInventory().clear();
+                player.teleport(location);
+                currentLoc++;
+            }
+        });
     }
 
     public List<Player> getPlaying() {

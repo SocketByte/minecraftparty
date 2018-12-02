@@ -28,9 +28,12 @@ public class Board {
     }
 
     public void updateTitle(String title) {
-        this.title = title;
-        this.objective.setDisplayName(MessageHelper.fixColor(this.title));
-        this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        try {
+            this.title = title;
+            this.objective.setDisplayName(MessageHelper.fixColor(this.title));
+            this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        } catch (Exception e) { }
+
     }
 
     public void setScore(String entry, int score) {

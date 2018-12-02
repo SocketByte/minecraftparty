@@ -90,6 +90,9 @@ public class HorseRaceArena extends Arena {
         if (!getGame().isArena(this))
             return;
 
+        if (isFreezed() || !isActive())
+            return;
+
         if (isCountdown() && (event.getTo().getX() != event.getFrom().getX()
                 || event.getTo().getY() != event.getFrom().getY()
                 || event.getTo().getZ() != event.getFrom().getZ())) {

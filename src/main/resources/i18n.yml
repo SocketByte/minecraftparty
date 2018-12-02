@@ -95,3 +95,12 @@ spleef:
   goal: 'Podkop innych graczy!'
   tip: 'Badz taktyczny!'
   died: '&cKtos cie podkopal!'
+one-in-the-chamber:
+  goal: 'Zastrzel jak najwieksza ilosc graczy!'
+  tip: 'Strzaly dostajesz po zabiciu gracza lub co 20 sekund!'
+king-of-the-hill:
+  goal: 'Zepchnij graczy z platformy!'
+  tip: 'Trzymaj sie srodka!'
+avalanche:
+  goal: 'Chowaj sie pod platformami przed burza sniezna!'
+  tip: 'Badz szybki!'

@@ -1,7 +1,9 @@
 package pl.socketbyte.minecraftparty.commons;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,39 @@ public class RandomHelper {
         }
         return null;
     }
+
+    public static Location randomizeLocation(Location location, int radius) {
+        Location old = location.clone();
+        int randomX = RandomHelper.randomInteger(-radius, radius);
+        int randomZ = RandomHelper.randomInteger(-radius, radius);
+
+        location.add(randomX, 0, randomZ);
+        if (location.clone().subtract(0, 1, 0).getBlock().getType() == Material.AIR) {
+            while (location.clone().subtract(0, 1, 0).getBlock().getType() == Material.AIR) {
+                location.subtract(0, 1, 0);
+            }
+        }
+        else if (location.clone().add(0, 1, 0).getBlock().getType() != Material.AIR
+                || location.getBlock().getType() != Material.AIR) {
+            while (location.clone().add(0, 1, 0).getBlock().getType() != Material.AIR
+                    && location.getBlock().getType() != Material.AIR) {
+                location.add(0, 1, 0);
+            }
+            location.add(0, 1, 0);
+        }
+        if (location.clone().add(0, 1, 0).getBlock().getType() != Material.AIR && location.getBlock().getType() != Material.AIR)
+            return randomizeLocation(old, radius);
+        return location;
+    }
+
+    public static List<Location> createRandomizedLocations(Location base, int radius, int size) {
+        List<Location> locations = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            locations.add(randomizeLocation(base, radius));
+        }
+        return locations;
+    }
+
 
     public static List<Location> createRandomLocations(World world, double min, double max, double height, int size) {
         List<Location> locations = new ArrayList<>();

@@ -21,7 +21,8 @@ public class DiamondMineArena extends Arena {
 
     private Location min;
     private Location max;
-    private int probability;
+    private int probabilityDiamond;
+    private int probabilityEmerald;
 
     public DiamondMineArena(Game game) {
         super(game);
@@ -48,7 +49,7 @@ public class DiamondMineArena extends Arena {
             player.getInventory().clear();
             player.teleport(getArenaInfo().getDefaultLocation());
         }
-        generate(0);
+        generate(0, 0);
     }
 
     @Override
@@ -60,20 +61,23 @@ public class DiamondMineArena extends Arena {
         min = minMax[0];
         max = minMax[1];
 
-        probability = getArenaInfo().getData().getInt("probability");
+        probabilityDiamond = getArenaInfo().getData().getInt("probability-diamond");
+        probabilityEmerald = getArenaInfo().getData().getInt("probability-emerald");
 
-        generate(0);
+        generate(0, 0);
     }
 
-    public void generate(int probability) {
+    public void generate(int probabilityDiamond, int probabilityEmerald) {
         for (int x = min.getBlockX(); x < max.getBlockX(); x++) {
             for (int y = min.getBlockY(); y < max.getBlockY(); y++) {
                 for (int z = min.getBlockZ(); z < max.getBlockZ(); z++) {
                     Location location = new Location(getArenaInfo().getDefaultLocation().getWorld(),
                             x, y, z);
 
-                    if (RandomHelper.chance(probability))
+                    if (RandomHelper.chance(probabilityDiamond))
                         location.getBlock().setType(Material.DIAMOND_ORE);
+                    else if (RandomHelper.chance(probabilityEmerald))
+                        location.getBlock().setType(Material.EMERALD_ORE);
                     else location.getBlock().setType(Material.STONE);
                 }
             }
@@ -87,7 +91,7 @@ public class DiamondMineArena extends Arena {
             player.getInventory().setItem(0, new ItemStack(Material.DIAMOND_PICKAXE));
             player.getInventory().setHeldItemSlot(0);
         }
-        generate(probability);
+        generate(probabilityDiamond, probabilityEmerald);
     }
 
     @EventHandler
@@ -107,6 +111,11 @@ public class DiamondMineArena extends Arena {
         if (event.getBlock().getType().equals(Material.DIAMOND_ORE)) {
             addInternalScore(player, 1);
             player.getInventory().addItem(new ItemStack(Material.DIAMOND));
+            event.getBlock().setType(Material.AIR);
+        }
+        else if (event.getBlock().getType().equals(Material.EMERALD_ORE)) {
+            addInternalScore(player, 3);
+            player.getInventory().addItem(new ItemStack(Material.EMERALD));
             event.getBlock().setType(Material.AIR);
         }
         else if (event.getBlock().getType().equals(Material.STONE)) {

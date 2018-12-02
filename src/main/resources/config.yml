@@ -9,6 +9,43 @@ games:
     max-players: 8 # maksymalna ilosc graczy
     start-threshold: 1 # minimalna ilosc graczy do rozpoczecia gry
     arenas: # konfiguracja aren
+      avalanche:
+        spawn-location:
+          world: world
+          x: 6000
+          y: 100
+          z: 6000
+        time: 200
+        countdown: 10
+        data:
+          baseTime: 12
+          locations:
+            min:
+              x: 5996
+              y: 101
+              z: 5987
+            max:
+              x: 6012
+              y: 101
+              z: 6002
+      king-of-the-hill:
+        spawn-location:
+          world: world
+          x: 5500
+          y: 152
+          z: 5500
+        time: 70
+        countdown: 10
+      one-in-the-chamber:
+        spawn-location:
+          world: world
+          x: 5000
+          y: 130
+          z: 5000
+        time: 70
+        countdown: 20
+        data:
+          radius: 30
       minefield:
         spawn-location:
           world: world
@@ -55,7 +92,8 @@ games:
         time: 60
         countdown: 10
         data:
-          probability: 20
+          probability-diamond: 10
+          probability-emerald: 2
           locations:
             min:
               x: 3985

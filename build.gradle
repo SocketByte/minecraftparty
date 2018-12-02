@@ -31,9 +31,7 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-
-    compile name: 'bukkit';
+    compileOnly name: 'bukkit'
 
     compile 'com.boydti:fawe-api:latest'
     compileOnly 'com.sk89q:worldedit:6.0.0-SNAPSHOT'

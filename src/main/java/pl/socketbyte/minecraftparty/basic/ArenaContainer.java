@@ -19,6 +19,9 @@ public class ArenaContainer {
         arenaNames.put("minefield", MinefieldArena.class);
         arenaNames.put("diamond-mine", DiamondMineArena.class);
         arenaNames.put("spleef", SpleefArena.class);
+        arenaNames.put("one-in-the-chamber", OneInTheChamberArena.class);
+        arenaNames.put("king-of-the-hill", KingOfTheHillArena.class);
+        arenaNames.put("avalanche", AvalancheArena.class);
     }
 
     public static void addArena(String arenaName, Class<? extends Arena> arenaClass) {
