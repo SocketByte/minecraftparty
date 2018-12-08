@@ -7,7 +7,7 @@ import pl.socketbyte.minecraftparty.basic.Game;
 import pl.socketbyte.minecraftparty.basic.arena.helper.trampolinio.BaloonEntity;
 import pl.socketbyte.minecraftparty.basic.data.Connector;
 import pl.socketbyte.minecraftparty.basic.data.ModelPersistence;
-import pl.socketbyte.minecraftparty.basic.func.DoubleJump;
+import pl.socketbyte.minecraftparty.basic.arena.helper.punchthebats.DoubleJump;
 import pl.socketbyte.minecraftparty.command.CommandManager;
 import pl.socketbyte.minecraftparty.command.impl.JoinGameCommand;
 import pl.socketbyte.minecraftparty.commons.NMSHelper;

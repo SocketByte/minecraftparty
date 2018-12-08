@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 import pl.socketbyte.minecraftparty.basic.Arena;
@@ -132,6 +133,17 @@ public class TrampolinioArena extends Arena {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
+        if (!getGame().isPlaying(event.getPlayer()))
+            return;
+
+        if (!getGame().isArena(this))
+            return;
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
         if (!getGame().isPlaying(event.getPlayer()))
             return;
 

@@ -1,4 +1,4 @@
-package pl.socketbyte.minecraftparty.basic.func;
+package pl.socketbyte.minecraftparty.basic.arena.helper.punchthebats;
 
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 

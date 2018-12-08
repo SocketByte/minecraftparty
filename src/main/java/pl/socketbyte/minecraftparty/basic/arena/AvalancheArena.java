@@ -68,6 +68,7 @@ public class AvalancheArena extends Arena {
         waveInProgress = true;
 
         countdownTime = baseTime;
+        checked = false;
 
         place();
 
@@ -80,33 +81,21 @@ public class AvalancheArena extends Arena {
             // avalanche fall
             spawnSnowballs();
 
-            TaskHelper.delay(() -> {
-                for (Player player : getGame().getPlaying()) {
-                    Location location = player.getLocation();
-                    if (location.getBlockX() != slabLocation.getBlockX() || location.getBlockZ() != slabLocation.getBlockZ()) {
-                        disqualify(player);
-                        player.teleport(getArenaInfo().getDefaultLocation().clone().add(0, 10, 0));
 
-                        setInternalScore(player, getInternalScore(player) - 1);
-                        System.out.println("Hit!");
+            TaskHelper.delay(() -> {
+                if (baseTime > 1) {
+                    baseTime--;
+                    if (baseTime == 1) {
+                        setPvp(true);
+                        setInfiniteHealth(false);
                     }
                 }
+                waveInProgress = false;
+                // on wave reset
 
-                TaskHelper.delay(() -> {
-                    if (baseTime > 1) {
-                        baseTime--;
-                        if (baseTime == 1) {
-                            setPvp(true);
-                            setInfiniteHealth(false);
-                        }
-                    }
-                    waveInProgress = false;
-                    // on wave reset
-
-                    balls.clear();
-                    remove();
-                }, 5, TimeUnit.SECONDS);
-            }, 3, TimeUnit.SECONDS);
+                balls.clear();
+                remove();
+            }, 5, TimeUnit.SECONDS);
         }, baseTime + 1, TimeUnit.SECONDS);
     }
 
@@ -126,7 +115,6 @@ public class AvalancheArena extends Arena {
     }
 
     public void spawnSnowballs() {
-        System.out.println("Spawned!");
         for (double x = min.getX(); x < max.getX(); x++) {
             for (double z = min.getZ(); z < max.getZ(); z++) {
                 Location location = new Location(getArenaInfo().getDefaultLocation().getWorld(),
@@ -140,6 +128,37 @@ public class AvalancheArena extends Arena {
                 balls.put(ball.getUniqueId(), ball);
             }
         }
+    }
+
+    private boolean checked = false;
+    @EventHandler
+    public void onHit(ProjectileHitEvent event) {
+        if (!getGame().isArena(this))
+            return;
+        if (event.getEntityType() != EntityType.SNOWBALL)
+            return;
+        if (isFreezed() || !isActive())
+            return;
+
+        Snowball entity = (Snowball) event.getEntity();
+        if (!balls.containsKey(entity.getUniqueId()))
+            return;
+
+        if (checked)
+            return;
+
+        for (Player player : getGame().getPlaying()) {
+            if (isDisqualified(player))
+                continue;
+            Location location = player.getLocation();
+            if (location.getBlockX() != slabLocation.getBlockX() || location.getBlockZ() != slabLocation.getBlockZ()) {
+                disqualify(player);
+                player.teleport(getArenaInfo().getDefaultLocation().clone().add(0, 10, 0));
+
+                setInternalScore(player, getInternalScore(player) - 1);
+            }
+        }
+        checked = true;
     }
 
     @EventHandler

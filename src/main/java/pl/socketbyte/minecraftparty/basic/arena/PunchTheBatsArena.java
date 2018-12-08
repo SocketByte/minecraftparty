@@ -14,7 +14,7 @@ import pl.socketbyte.minecraftparty.basic.Arena;
 import pl.socketbyte.minecraftparty.basic.Game;
 import pl.socketbyte.minecraftparty.basic.arena.helper.punchthebats.ArenaBat;
 import pl.socketbyte.minecraftparty.basic.board.impl.ArenaBoardType;
-import pl.socketbyte.minecraftparty.basic.func.DoubleJump;
+import pl.socketbyte.minecraftparty.basic.arena.helper.punchthebats.DoubleJump;
 import pl.socketbyte.minecraftparty.commons.MessageHelper;
 import pl.socketbyte.minecraftparty.commons.RandomHelper;
 import pl.socketbyte.minecraftparty.commons.io.I18n;

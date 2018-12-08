@@ -16,7 +16,7 @@ games:
           y: 100
           z: 6000
         time: 200
-        countdown: 10
+        countdown: 15
         data:
           baseTime: 12
           locations:
@@ -35,7 +35,7 @@ games:
           y: 152
           z: 5500
         time: 70
-        countdown: 10
+        countdown: 15
       one-in-the-chamber:
         spawn-location:
           world: world
@@ -53,7 +53,7 @@ games:
           y: 99
           z: 3500
         time: 70
-        countdown: 10
+        countdown: 15
         data:
           probability: 30
           locations:
@@ -69,10 +69,10 @@ games:
         spawn-location:
           world: world
           x: 4500
-          y: 101
+          y: 102
           z: 4500
         time: 100
-        countdown: 10
+        countdown: 15
         data:
           locations:
             min:
@@ -87,10 +87,10 @@ games:
         spawn-location:
           world: world
           x: 4000
-          y: 215
+          y: 218
           z: 4000
         time: 60
-        countdown: 10
+        countdown: 15
         data:
           probability-diamond: 10
           probability-emerald: 2
@@ -110,7 +110,7 @@ games:
           y: 100
           z: 3000
         time: 70
-        countdown: 10
+        countdown: 15
         data:
           checkpoint-locations:
             1:
@@ -136,7 +136,7 @@ games:
           y: 100
           z: 2500
         time: 60
-        countdown: 10
+        countdown: 15
         data:
           radius: 7
           amount: 15
@@ -165,7 +165,7 @@ games:
           y: 101
           z: 1500
         time: 70
-        countdown: 10
+        countdown: 15
         data:
           radius: 6
           target: 15
@@ -201,7 +201,7 @@ games:
           y: 100
           z: 1000
         time: 60 # czas trwania areny w sekundach
-        countdown: 10 # czas odliczania do startu areny w sekundach
+        countdown: 15 # czas odliczania do startu areny w sekundach
         data: # dodatkowe informacje o iearenie, sa rozne na kazdej (!)
           bats: 50
           bat-loc-randomize:
@@ -227,7 +227,7 @@ games:
           y: 101
           z: 2000
         time: 240
-        countdown: 10
+        countdown: 15
         data:
           colors:
             RED: '&4&lCzerwony'

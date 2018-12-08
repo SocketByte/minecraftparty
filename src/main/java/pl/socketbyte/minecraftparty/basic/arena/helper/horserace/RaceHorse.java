@@ -27,6 +27,7 @@ public class RaceHorse {
         horse.setMaxHealth(1000);
         horse.setHealth(1000);
         horse.setOwner(owner);
+        horse.setStyle(Horse.Style.BLACK_DOTS);
         horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
         this.horse = horse;
     }

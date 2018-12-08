@@ -70,6 +70,7 @@ public class MinefieldArena extends Arena {
     }
 
     private List<Player> winners = new ArrayList<>();
+    private Player first;
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!getGame().isPlaying(event.getPlayer()))
@@ -104,6 +105,11 @@ public class MinefieldArena extends Arena {
 
             addInternalScore(player, 25);
             winners.add(player);
+
+            if (first == null) {
+                first = player;
+                addInternalScore(player, 25);
+            }
             return;
         }
 

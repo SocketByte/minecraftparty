@@ -74,6 +74,9 @@ public class SpleefArena extends Arena {
         if (isDisqualified(event.getPlayer()))
             return;
 
+        if (isCountdown() || isFreezed())
+            return;
+
         Player player = event.getPlayer();
         if (player.getLocation().getY() < min.getY() + 1.0) {
             disqualify(player);

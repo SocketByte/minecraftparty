@@ -212,6 +212,9 @@ public class WoolMixupArena extends Arena {
         if (!getGame().isArena(this))
             return;
 
+        if (isCountdown() || isFreezed())
+            return;
+
         TaskHelper.async(() -> {
             Player player = event.getPlayer();
 
@@ -303,8 +306,6 @@ public class WoolMixupArena extends Arena {
 
     public void excludeExcept(DyeColor color) {
         for (WoolCell cell : cells) {
-            DyeColor[] colors = DyeColor.values();
-
             if (cell.getColor() != color) {
                 cell.remove(session);
             }
@@ -312,12 +313,14 @@ public class WoolMixupArena extends Arena {
         session.flushQueue();
     }
 
+    /**
+     * Change wool colors to the skin color of the true world masters
+     * @see White supremacy
+     */
     public void makeWhite() {
-        for (WoolCell cell : cells) {
-            DyeColor[] colors = DyeColor.values();
-
+        for (WoolCell cell : cells)
             cell.paint(session, DyeColor.WHITE);
-        }
+
         session.flushQueue();
     }
 

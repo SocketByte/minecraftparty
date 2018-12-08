@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import pl.socketbyte.minecraftparty.MinecraftParty;
 import pl.socketbyte.minecraftparty.basic.board.impl.GameBoard;
-import pl.socketbyte.minecraftparty.basic.func.DoubleJump;
+import pl.socketbyte.minecraftparty.basic.arena.helper.punchthebats.DoubleJump;
 import pl.socketbyte.minecraftparty.commons.MessageHelper;
 import pl.socketbyte.minecraftparty.commons.SortHelper;
 import pl.socketbyte.minecraftparty.commons.TaskHelper;

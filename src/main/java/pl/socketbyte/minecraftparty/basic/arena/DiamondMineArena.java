@@ -82,6 +82,14 @@ public class DiamondMineArena extends Arena {
                 }
             }
         }
+        int y = max.getBlockY() - 1;
+        for (int x = min.getBlockX(); x < max.getBlockX(); x++) {
+            for (int z = min.getBlockZ(); z < max.getBlockZ(); z++) {
+                Location location = new Location(getArenaInfo().getDefaultLocation().getWorld(),
+                        x, y, z);
+                location.getBlock().setType(Material.GRASS);
+            }
+        }
     }
 
     @Override
@@ -118,7 +126,8 @@ public class DiamondMineArena extends Arena {
             player.getInventory().addItem(new ItemStack(Material.EMERALD));
             event.getBlock().setType(Material.AIR);
         }
-        else if (event.getBlock().getType().equals(Material.STONE)) {
+        else if (event.getBlock().getType().equals(Material.STONE)
+                || event.getBlock().getType().equals(Material.GRASS)) {
             event.getBlock().setType(Material.AIR);
         }
     }
